@@ -421,7 +421,12 @@ I can only work 1 project at a time sorry D:</p>
 		};
 		
 		if (backgroundImages[pageId]) {
-			document.body.style.backgroundImage = `url("${backgroundImages[pageId]}")`;
+			// Encode spaces in paths for GitHub Pages compatibility
+			// GitHub Pages requires URL encoding for spaces in file paths
+			const imagePath = backgroundImages[pageId];
+			const encodedPath = imagePath.replace(/ /g, '%20');
+			
+			document.body.style.backgroundImage = `url("${encodedPath}")`;
 			document.body.style.backgroundSize = 'cover';
 			document.body.style.backgroundPosition = 'center';
 			document.body.style.backgroundRepeat = 'no-repeat';
