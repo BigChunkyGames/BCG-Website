@@ -60,10 +60,11 @@ nav a:hover {
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
 #content {
-    background-color: #333;
+    background-color: #333333d7;
     border-radius: 30px;
     padding: 30px;
     margin-top: 30px;
+    margin-bottom: 100px; /* Add space for fixed footer */
     text-align: center;
 }
 .fluffy-shape {
@@ -297,4 +298,39 @@ p {
 	margin: 20px auto; /* Centers the divider horizontally and adds space above and below */
 	border: none; /* Removes default border */
 	border-top: 2px solid black; /* Adds a black line */
+}
+
+.legal-footer {
+	background-color: #303030;
+	color: #dddddd;
+	padding: 15px 20px;
+	border-radius: 30px 30px 0 0;
+	text-align: center;
+	font-size: 0.9em;
+	z-index: 100;
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	width: 100%;
+	max-width: 1200px;
+	margin: 0 auto;
+}
+
+.legal-footer p {
+	margin: 5px 0;
+	text-align: center;
+}
+
+.legal-footer a {
+	color: #e9ff28;
+	text-decoration: underline;
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
+
+.legal-footer a:hover {
+	font-weight: bold;
+	transform: scale(1.05);
+	display: inline-block;
 }

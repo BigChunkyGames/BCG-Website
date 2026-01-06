@@ -13,17 +13,17 @@ document.addEventListener('DOMContentLoaded', () => {
 		`,
 		'ace-of-space': `
 			<h2>Ace of Space</h2>
-			<a href="https://bigchunkygames.itch.io/ace-of-space" target="_blank" class="button">Play on itch.io</a>
-
+			
 			<p>Ace of Space is a roguelike deckbuilder about growing your armada and rescuing the galaxy from the forces of chaos. </p>
 
+			<a href="https://store.steampowered.com/app/3242880/Ace_of_Space/" target="_blank" class="button">Check it out on Steam!</a>
+
 			<p>Select a flagship and embark on a journey across a universe on the brink of annihilation. Construct your deck of ships and science, obtain powerful artifacts to enhance your strategy, and make tough choices for the good of the galaxy. Warp across sectors, battle hostile factions, and face impossible odds as the universe itself collapses around you. </p>
-			<a href="https://store.steampowered.com/app/3242880/Ace_of_Space/" target="_blank" class="button">Wishlist on Steam</a>
 			</br></br>
 
 			<p>When the idea for Ace of Space first occurred to us, we knew instantly that we had what it would take to make it, we knew how, and most importantly, we knew that it would be a lot of fun to make all the little ships. So for almost every day from August to December of 2024 we spent time creating the game. A few 13 hour Saturdays can really go a long way. It was fast progress at first - now that its January when I'm writing this the game is in a state that I think a lot of people could enjoy. Too bad nobody knows about it yet. We're working on that. 
 			</br></br>
-			<h3>[Status: Active Development!]</h3>
+			<h3>[Status: Published!]</h3>
 		`,
 		'adventure-dodge': `
 			<h2>Adventure Dodge</h2>
@@ -62,12 +62,15 @@ document.addEventListener('DOMContentLoaded', () => {
 		'dot-wars': `
 			<h2>Dot Wars</h2>
 			<p>It's a physics simulation competition youtube channel! Kind of like multiply and release videos but with more features!</p>
-			<a href="https://www.youtube.com/@Dot_Wars/videos" target="_blank" class="button">Check out the youtube channel!</a>
+			<a href="https://www.youtube.com/@BigChunkyGames/videos" target="_blank" class="button">Check out the youtube channel!</a>
 			</br></br>
 
 			<iframe width="420" height="315"
-src="https://www.youtube.com/embed/Suc-KLHwXbc?autoplay=1&mute=1">
-</iframe>
+				src="https://www.youtube.com/embed/Suc-KLHwXbc"
+				frameborder="0"
+				allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+				allowfullscreen>
+			</iframe>
 </br></br>
 <h3>[Status: On Hold]</h3>
 		`,
@@ -152,7 +155,11 @@ I can only work 1 project at a time sorry D:</p>
 		`,
 		secrets: `
 			<h2>Secrets</h2>
+			<img src="rf images/rf2.png">
+			<br>
 			<button id="rainbowModeButton" class="button">Rainbow Mode</button>
+			<br>
+			<button id="spinModeButton" class="button">Tornado Mode</button>
 		`
 	};
 	
@@ -178,8 +185,264 @@ I can only work 1 project at a time sorry D:</p>
 					element.classList.toggle('rainbow');
 				});
 			});
+			
+			const spinModeButton = document.getElementById('spinModeButton');
+			let isSpinning = false;
+			let spinAnimationId = null;
+			let rotationAngle = 0;
+			let startSpeed = 0.001;
+			let spinSpeed = 0.0; // degrees per frame
+			let speedIncreaseRate = 0.01; // speed increase per frame
+			
+			spinModeButton.addEventListener('click', () => {
+				if (!isSpinning) {
+					isSpinning = true;
+					spinSpeed = startSpeed; // reset speed
+					rotationAngle = 0;
+					const startTime = Date.now();
+					const totalDuration = 20000; // 20 seconds in milliseconds
+					const accelerationPhase = 10000; // 10 seconds in milliseconds
+					let maxSpeed = 0;
+					
+					const elements = document.querySelectorAll('div:not(#clouds-container), body, header');
+					const container = document.querySelector('.container');
+					
+					// Set transform-origin to center for all elements
+					elements.forEach(element => {
+						element.style.transformOrigin = 'center center';
+					});
+					
+					function animate() {
+						const elapsed = Date.now() - startTime;
+						
+						if (elapsed >= totalDuration) {
+							// Stop after 20 seconds
+							isSpinning = false;
+							if (spinAnimationId) {
+								cancelAnimationFrame(spinAnimationId);
+							}
+							
+							// Reset all transforms and transform-origin
+							const resetElements = document.querySelectorAll('div:not(#clouds-container), body, header');
+							const resetContainer = document.querySelector('.container');
+							resetElements.forEach(element => {
+								// Restore the container's original transform
+								if (element === resetContainer) {
+									element.style.transform = 'translateX(-50%)';
+								} else {
+									element.style.transform = '';
+								}
+								element.style.transformOrigin = '';
+							});
+							return;
+						}
+						
+						// Calculate speed based on phase
+						if (elapsed < accelerationPhase) {
+							// First 10 seconds: accelerate
+							const progress = elapsed / accelerationPhase; // 0 to 1
+							spinSpeed = startSpeed + (progress * progress * 10); // quadratic acceleration
+							maxSpeed = spinSpeed;
+						} else {
+							// Next 10 seconds: decelerate
+							const decelProgress = (elapsed - accelerationPhase) / accelerationPhase; // 0 to 1
+							spinSpeed = maxSpeed * (1 - decelProgress * decelProgress); // quadratic deceleration
+						}
+						
+						rotationAngle += spinSpeed;
+						
+						elements.forEach(element => {
+							// Preserve the container's translateX transform
+							if (element === container) {
+								element.style.transform = `translateX(-50%) rotate(${rotationAngle}deg)`;
+							} else {
+								element.style.transform = `rotate(${rotationAngle}deg)`;
+							}
+						});
+						
+						if (isSpinning) {
+							spinAnimationId = requestAnimationFrame(animate);
+						}
+					}
+					
+					animate();
+				} else {
+					isSpinning = false;
+					if (spinAnimationId) {
+						cancelAnimationFrame(spinAnimationId);
+					}
+					
+					// Reset all transforms and transform-origin
+					const elements = document.querySelectorAll('div:not(#clouds-container), body, header');
+					const container = document.querySelector('.container');
+					elements.forEach(element => {
+						// Restore the container's original transform
+						if (element === container) {
+							element.style.transform = 'translateX(-50%)';
+						} else {
+							element.style.transform = '';
+						}
+						element.style.transformOrigin = '';
+					});
+				}
+			});
 		}
 		
+		// Explode functionality - available on all pages via footer link
+		const destroyLink = document.getElementById('destroyLink');
+		let isExploding = false;
+		let explodeAnimationId = null;
+		let elementStates = new Map();
+		
+		if (destroyLink) {
+			destroyLink.addEventListener('click', (e) => {
+				e.preventDefault();
+				if (!isExploding) {
+					isExploding = true;
+					const elements = document.querySelectorAll('div:not(#clouds-container):not(.cloud):not(.fluffy-shape), body, header');
+					const container = document.querySelector('.container');
+					
+					// Store initial positions and create explosion data for each element
+					elementStates.clear();
+					elements.forEach(element => {
+						const rect = element.getBoundingClientRect();
+						const centerX = rect.left + rect.width / 2;
+						const centerY = rect.top + rect.height / 2;
+						
+						// Random explosion direction and speed
+						const angle = Math.random() * Math.PI * 2;
+						const velocity = 2 + Math.random() * 8; // Random speed between 2-10
+						const rotationSpeed = (Math.random() - 0.5) * 20; // Random rotation speed
+						const scaleSpeed = 0.02 + Math.random() * 0.03; // Random scale increase
+						
+						elementStates.set(element, {
+							startX: centerX,
+							startY: centerY,
+							velocityX: Math.cos(angle) * velocity,
+							velocityY: Math.sin(angle) * velocity,
+							rotation: 0,
+							rotationSpeed: rotationSpeed,
+							scale: 1,
+							scaleSpeed: scaleSpeed,
+							opacity: 1,
+							originalTransform: element.style.transform,
+							isContainer: element === container
+						});
+						
+						// Set transform origin to center
+						element.style.transformOrigin = 'center center';
+						element.style.transition = 'none';
+					});
+					
+					const startTime = Date.now();
+					const explosionDuration = 2000; // 2 seconds
+					
+					function animate() {
+						const elapsed = Date.now() - startTime;
+						const progress = elapsed / explosionDuration;
+						
+						if (progress >= 1 || !isExploding) {
+							// Reset everything
+							isExploding = false;
+							if (explodeAnimationId) {
+								cancelAnimationFrame(explodeAnimationId);
+							}
+							
+							elements.forEach(element => {
+								const state = elementStates.get(element);
+								if (state) {
+									if (state.isContainer) {
+										element.style.transform = 'translateX(-50%)';
+									} else {
+										element.style.transform = state.originalTransform || '';
+									}
+									element.style.opacity = '';
+									element.style.transformOrigin = '';
+									element.style.transition = '';
+								}
+							});
+							elementStates.clear();
+							return;
+						}
+						
+						// Apply explosion effects with easing (ease out)
+						const easeOut = 1 - Math.pow(1 - progress, 3);
+						
+						elements.forEach(element => {
+							const state = elementStates.get(element);
+							if (state) {
+								// Update rotation
+								state.rotation += state.rotationSpeed;
+								
+								// Calculate position based on velocity and time
+								const distanceX = state.velocityX * easeOut * 100;
+								const distanceY = state.velocityY * easeOut * 100;
+								
+								// Update scale (grow then shrink)
+								const scaleProgress = progress < 0.3 ? progress / 0.3 : (1 - progress) / 0.7;
+								state.scale = 1 + (scaleProgress * 0.5);
+								
+								// Update opacity (fade out)
+								state.opacity = 1 - progress;
+								
+								// Apply transforms
+								let transform = '';
+								if (state.isContainer) {
+									transform = `translateX(-50%) translate(${distanceX}px, ${distanceY}px) rotate(${state.rotation}deg) scale(${state.scale})`;
+								} else {
+									transform = `translate(${distanceX}px, ${distanceY}px) rotate(${state.rotation}deg) scale(${state.scale})`;
+								}
+								
+								element.style.transform = transform;
+								element.style.opacity = state.opacity;
+							}
+						});
+						
+						if (isExploding) {
+							explodeAnimationId = requestAnimationFrame(animate);
+						}
+					}
+					
+					animate();
+				}
+			});
+		}
+		
+		// Set background image based on page
+		const backgroundImages = {
+			'ace-of-space': 'ace images/resistance 2.png',
+			'adventure-dodge': 'ad images/IImwZ6.png',
+			'black-perpetuum': 'bp images/bp3.png',
+			'advance-quest': 'aq images/aw1.png',
+			'dot-wars': 'dw images/image.png',
+			'cannon-miner': 'cm images/cm1.png',
+			'ridiculous-fish': 'rf images/rf1.png',
+			"music": "music images/pyramids album.jpg",
+		};
+		
+		if (backgroundImages[pageId]) {
+			document.body.style.backgroundImage = `url("${backgroundImages[pageId]}")`;
+			document.body.style.backgroundSize = 'cover';
+			document.body.style.backgroundPosition = 'center';
+			document.body.style.backgroundRepeat = 'no-repeat';
+			document.body.style.backgroundAttachment = 'fixed';
+		} else {
+			document.body.style.backgroundImage = 'none';
+			document.body.style.backgroundSize = '';
+			document.body.style.backgroundPosition = '';
+			document.body.style.backgroundRepeat = '';
+			document.body.style.backgroundAttachment = '';
+		}
+		
+		// Show/hide main logo based on page
+		const mainLogo = document.querySelector('.main-logo');
+		if (mainLogo) {
+			if (pageId === 'home') {
+				mainLogo.style.display = 'block';
+			} else {
+				mainLogo.style.display = 'none';
+			}
+		}
 		
 	}
 
